@@ -1,112 +1,112 @@
-import random
-import turtle
+from itertools import cycle
+from random import randrange
+from tkinter import Canvas, Tk, messagebox, font
 
-turtle.bgcolor("yellow")
+canvas_width = 800
+canvas_height = 400
 
-caterpillar = turtle.Turtle()
-caterpillar.shape("square")
-caterpillar.color("red")
-caterpillar.speed(0)
-caterpillar.penup()
-caterpillar.hideturtle()
+root = Tk()
+c = Canvas(root, width=canvas_width, height=canvas_height, background='deep sky blue')
+c.create_rectangle(-5, canvas_height - 100, canvas_width + 5, canvas_height + 5,
+                   fill='sea green', width=0)
+c.create_oval(-80, -80, 120, 120, fill='orange', width=0)
+c.pack()
 
-leaf = turtle.Turtle()
-leaf_shape = ((0, 0), (14, 2), (18, 6), (20, 20), (6, 18), (2, 14))
-turtle.register_shape("leaf", leaf_shape)
-leaf.shape("leaf")
-leaf.color("green")
-leaf.penup()
-leaf.hideturtle()
-leaf.speed(0)
+color_cycle = cycle(['light blue', 'light green', 'light pink', 'light yellow', 'light cyan'])
+egg_width = 45
+egg_height = 55
+egg_score = 10
+egg_speed = 500
+egg_interval = 4000
+difficulty_factor = 0.95
 
-game_started = False
-text_turtle = turtle.Turtle()
-text_turtle.write("Press SPACE to start", align="center", font=("Arial", 16, "bold"))
-text_turtle.hideturtle()
+catcher_color = 'blue'
+catcher_width = 100
+catcher_height = 100
+catcher_start_x = canvas_width / 2 - catcher_width / 2
+catcher_start_y = canvas_height - catcher_height - 20
+catcher_start_x2 = catcher_start_x + catcher_width
+catcher_start_y2 = catcher_start_y + catcher_height
 
-score_turtle = turtle.Turtle()
-score_turtle.hideturtle()
-score_turtle.speed(0)
+catcher = c.create_arc(catcher_start_x, catcher_start_y,
+                       catcher_start_x2, catcher_start_y2, start=200, extent=140,
+                       style='arc', outline=catcher_color, width=3)
 
-def outside_window():
-    left_wall = -turtle.window_width() / 2
-    right_wall = turtle.window_width() / 2
-    top_wall = turtle.window_height() / 2
-    bottom_wall = -turtle.window_height() / 2
-    (x, y) = caterpillar.pos()
-    outside = x < left_wall or x > right_wall or y < bottom_wall or y > top_wall
-    return outside
+game_font = font.nametofont('TkFixedFont')
+game_font.config(size=18)
 
-def game_over():
-    caterpillar.color("yellow")
-    leaf.color("yellow")
-    turtle.penup()
-    turtle.hideturtle()
-    turtle.write("GAME OVER!", align="center", font=("Arial", 30, "normal"))
+score = 0
+score_text = c.create_text(10, 10, anchor='nw', font=game_font, fill='darkblue',
+                           text='Score: ' +str(score))
 
-def display_score(current_score):
-    score_turtle.clear()
-    score_turtle.penup()
-    x = (turtle.window_width() / 2) - 50
-    y = (turtle.window_height() / 2) - 50
-    score_turtle.setpos(x, y)
-    score_turtle.write(str(current_score), align="right", font=("Arial", 40, "bold"))
+lives_remaining = 3
+lives_text = c.create_text(canvas_width - 10, 10, anchor='ne', font=game_font,
+                           fill='darkblue', text='Lives ' + str(lives_remaining))
 
-def place_leaf():
-    leaf.ht()
-    leaf.setx(random.randint(-200, 200))
-    leaf.sety(random.randint(-200, 200))
-    leaf.st()
+eggs = []
 
-def start_game():
-    global game_started
-    if game_started:
-        return
-    game_started = True
+def create_egg():
+    x = randrange(10, 740)
+    y = 40
+    new_egg = c.create_oval(x, y, x + egg_width, y + egg_height, fill=next(color_cycle), width=0)
+    eggs.append(new_egg)
+    root.after(egg_interval, create_egg)
 
-    score = 0
-    text_turtle.clear()
+def move_eggs():
+    for egg in eggs:
+        (egg_x, egg_y, egg_x2, egg_y2) = c.coords(egg)
+        c.move(egg, 0, 10)
+        if egg_y2 > canvas_height:
+            egg_dropped(egg)
+    root.after(egg_speed, move_eggs)
 
-    caterpillar_speed = 2
-    caterpillar_length = 3
-    caterpillar.shapesize(1, caterpillar_length, 1)
-    caterpillar.showturtle()
-    display_score(score)
-    place_leaf()
+def egg_dropped(egg):
+    eggs.remove(egg)
+    c.delete(egg)
+    lose_a_life()
+    if lives_remaining == 0:
+        messagebox.showinfo('Game Over!', 'Final Score: ' + str(score))
+        root.destroy()
 
-    while True:
-        caterpillar.forward(caterpillar_speed)
-        if caterpillar.distance(leaf) < 20:
-            place_leaf()
-            caterpillar_length += 1
-            caterpillar.shapesize(1, caterpillar_length, 1)
-            caterpillar_speed += 1
-            score += 10
-            display_score(score)
-        if outside_window:
-            game_over()
-            break
+def lose_a_life():
+    global lives_remaining
+    lives_remaining -= 1
+    c.itemconfigure(lives_text, text='Lives: ' + str(lives_remaining))
 
-def move_up():
-    if caterpillar.heading() == 0 or caterpillar.heading == 180:
-        caterpillar.setheading(90)
+def check_catch():
+    (catcher_x, catcher_y, catcher_x2, catcher_y2) = c.coords(catcher)
+    for egg in eggs:
+        (egg_x, egg_y, egg_x2, egg_y2) = c.coords(egg)
+        if catcher_x < egg_x and egg_x2 < catcher_x2 and catcher_y2 - egg_y2 < 40:
+            eggs.remove(egg)
+            c.delete(egg)
+            increase_score(egg_score)
+        root.after(100, check_catch)
 
-def move_down():
-    if caterpillar.heading() == 0 or caterpillar.heading == 180:
-        caterpillar.setheading(270)
+def increase_score(points):
+    global score, egg_speed, egg_interval
+    score += points
+    egg_speed = int(egg_speed * difficulty_factor)
+    egg_interval = int(egg_interval * difficulty_factor)
+    c.itemconfigure(score_text, text='Score: ' + str(score))
 
-def move_left():
-    if caterpillar.heading() == 90 or caterpillar.heading() == 270:
-        caterpillar.setheading(180)
+def move_left(event):
+    (x1, y1, x2, y2) = c.coords(catcher)
+    if x1 > 0:
+        c.move(catcher, -20, 0)
 
-def move_right():
-    if caterpillar.heading() == 90 or caterpillar.heading() == 270:
-        caterpillar.setheading(0)
+def move_right(event):
+    (x1, y1, x2, y2) = c.coords(catcher)
+    if x2 < canvas_width:
+        c.move(catcher, 20, 0)
 
-turtle.onkey(start_game, "space")
-turtle.onkey(move_up, "Up")
-turtle.onkey(move_right, "Right")
-turtle.onkey(move_down, "Down")
-turtle.onkey(move_left, "Left")
-turtle.listen()
-turtle.mainloop()
+c.bind('<Left>', move_left)
+c.bind('<Right>', move_right)
+c.focus_set()
+
+root.after(1000, create_egg)
+root.after(1000, move_eggs)
+root.after(1000, check_catch)
+root.mainloop()
+
+
