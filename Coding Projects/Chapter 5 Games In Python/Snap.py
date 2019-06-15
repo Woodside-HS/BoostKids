@@ -1,112 +1,104 @@
-import random
-import turtle
+import random, time
+from tkinter import Tk, Canvas, HIDDEN, NORMAL
 
-turtle.bgcolor("yellow")
+def next_shape():
+    global shape
+    global previous_color
+    global current_color
 
-caterpillar = turtle.Turtle()
-caterpillar.shape("square")
-caterpillar.color("red")
-caterpillar.speed(0)
-caterpillar.penup()
-caterpillar.hideturtle()
+    previous_color = current_color
+    c.delete(shape)
+    if len(shape) > 0:
+        shape = shapes.pop()
+        c.itemconfigure(shape, state=NORMAL)
+        current_color = c.itemcget(shape, 'fill')
+        root.after(1000, next_shape)
 
-leaf = turtle.Turtle()
-leaf_shape = ((0, 0), (14, 2), (18, 6), (20, 20), (6, 18), (2, 14))
-turtle.register_shape("leaf", leaf_shape)
-leaf.shape("leaf")
-leaf.color("green")
-leaf.penup()
-leaf.hideturtle()
-leaf.speed(0)
+    else:
+        c.unbind('q')
+        c.unbind('p')
+        if player1_score > player2_score:
+            c.create_text(200, 200, text='Winner: Player 1')
+        elif player2_score > player1_score:
+            c.create_text(200, 200, text='Winner: Player 2')
+        else:
+            c.create_text(200, 200, text='Draw')
+        c.pack()
 
-game_started = False
-text_turtle = turtle.Turtle()
-text_turtle.write("Press SPACE to start", align="center", font=("Arial", 16, "bold"))
-text_turtle.hideturtle()
 
-score_turtle = turtle.Turtle()
-score_turtle.hideturtle()
-score_turtle.speed(0)
+def snap(event):
+    global shape
+    global player1_score
+    global player2_score
+    valid = False
 
-def outside_window():
-    left_wall = -turtle.window_width() / 2
-    right_wall = turtle.window_width() / 2
-    top_wall = turtle.window_height() / 2
-    bottom_wall = -turtle.window_height() / 2
-    (x, y) = caterpillar.pos()
-    outside = x < left_wall or x > right_wall or y < bottom_wall or y > top_wall
-    return outside
+    c.delete(shape)
 
-def game_over():
-    caterpillar.color("yellow")
-    leaf.color("yellow")
-    turtle.penup()
-    turtle.hideturtle()
-    turtle.write("GAME OVER!", align="center", font=("Arial", 30, "normal"))
+    if previous_color == current_color:
+        valid = True
 
-def display_score(current_score):
-    score_turtle.clear()
-    score_turtle.penup()
-    x = (turtle.window_width() / 2) - 50
-    y = (turtle.window_height() / 2) - 50
-    score_turtle.setpos(x, y)
-    score_turtle.write(str(current_score), align="right", font=("Arial", 40, "bold"))
+    if valid:
+        if event.char == 'q':
+            player1_score += 1
+        else:
+            player2_score += 1
+        shape = c.text(200, 200, text='SNAP! You score 1 point!')
 
-def place_leaf():
-    leaf.ht()
-    leaf.setx(random.randint(-200, 200))
-    leaf.sety(random.randint(-200, 200))
-    leaf.st()
+    else:
+        if event.char == 'q':
+            player1_score -= 1
+        else:
+            player2_score -= 1
+        shape = c.create_text(200, 200, text='WRONG! You lose 1 point!')
+    c.pack()
+    root.update_idletasks()
+    time.sleep(1)
 
-def start_game():
-    global game_started
-    if game_started:
-        return
-    game_started = True
+root = Tk()
+root.title("snap")
 
-    score = 0
-    text_turtle.clear()
+c = Canvas(root, width=400, height=400)
+shapes = []
 
-    caterpillar_speed = 2
-    caterpillar_length = 3
-    caterpillar.shapesize(1, caterpillar_length, 1)
-    caterpillar.showturtle()
-    display_score(score)
-    place_leaf()
+circle = c.create_oval(35, 20, 365, 350, outline="black", state=NORMAL)
+shapes.append(circle)
+circle = c.create_oval(35, 20, 365, 350, outline="red", state=HIDDEN)
+shapes.append(circle)
+circle = c.create_oval(35, 20, 365, 350, outline="green", state=HIDDEN)
+shapes.append(circle)
+circle = c.create_oval(35, 20, 365, 350, outline="blue", state=HIDDEN)
+shapes.append(circle)
 
-    while True:
-        caterpillar.forward(caterpillar_speed)
-        if caterpillar.distance(leaf) < 20:
-            place_leaf()
-            caterpillar_length += 1
-            caterpillar.shapesize(1, caterpillar_length, 1)
-            caterpillar_speed += 1
-            score += 10
-            display_score(score)
-        if outside_window:
-            game_over()
-            break
+rectangle = c.create_rectangle(35, 100, 365, 270, outline='black', state=HIDDEN)
+shapes.append(rectangle)
+rectangle = c.create_rectangle(35, 100, 365, 270, outline='red', state=HIDDEN)
+shapes.append(rectangle)
+rectangle = c.create_rectangle(35, 100, 365, 270, outline='green', state=HIDDEN)
+shapes.append(rectangle)
+rectangle = c.create_rectangle(35, 100, 365, 270, outline='blue', state=HIDDEN)
+shapes.append(rectangle)
 
-def move_up():
-    if caterpillar.heading() == 0 or caterpillar.heading == 180:
-        caterpillar.setheading(90)
+square = c.create_rectangle(35, 20, 365, 350, outline='black', state=HIDDEN)
+shapes.append(square)
+square = c.create_rectangle(35, 20, 365, 350, outline='red', state=HIDDEN)
+shapes.append(square)
+square = c.create_rectangle(35, 20, 365, 350, outline='green', state=HIDDEN)
+shapes.append(square)
+square = c.create_rectangle(35, 20, 365, 350, outline='blue', state=HIDDEN)
+shapes.append(square)
 
-def move_down():
-    if caterpillar.heading() == 0 or caterpillar.heading == 180:
-        caterpillar.setheading(270)
+c.pack()
 
-def move_left():
-    if caterpillar.heading() == 90 or caterpillar.heading() == 270:
-        caterpillar.setheading(180)
+random.shuffle(shapes)
 
-def move_right():
-    if caterpillar.heading() == 90 or caterpillar.heading() == 270:
-        caterpillar.setheading(0)
+shape = None
+previous_color = ''
+current_color = ''
+player1_score = 0
+player2_score = 0
+root.after(3000, next_shape)
+c.bind('q', snap)
+c.bind('p', snap)
+c.focus_set()
 
-turtle.onkey(start_game, "space")
-turtle.onkey(move_up, "Up")
-turtle.onkey(move_right, "Right")
-turtle.onkey(move_down, "Down")
-turtle.onkey(move_left, "Left")
-turtle.listen()
-turtle.mainloop()
+root.mainloop()
