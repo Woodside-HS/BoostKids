@@ -81,7 +81,7 @@ def check_catch():
             eggs.remove(egg)
             c.delete(egg)
             increase_score(egg_score)
-        root.after(100, check_catch)
+    root.after(100, check_catch)
 
 def increase_score(points):
     global score, egg_speed, egg_interval
@@ -108,5 +108,3 @@ root.after(1000, create_egg)
 root.after(1000, move_eggs)
 root.after(1000, check_catch)
 root.mainloop()
-
-
