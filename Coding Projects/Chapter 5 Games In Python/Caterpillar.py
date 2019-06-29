@@ -71,7 +71,7 @@ def start_game():
     score = 0
     text_turtle.clear()
 
-    caterpillar_speed = 2
+    caterpillar_speed = 1.5
     caterpillar_length = 3
     caterpillar.shapesize(1, caterpillar_length, 1)
     caterpillar.showturtle()
@@ -84,33 +84,33 @@ def start_game():
             place_leaf()
             caterpillar_length += 1
             caterpillar.shapesize(1, caterpillar_length, 1)
-            caterpillar_speed += 1
+            caterpillar_speed += .25
             score += 10
             display_score(score)
-        if outside_window:
+        if outside_window():
             game_over()
             break
 
 def move_up():
-    if caterpillar.heading() == 0 or caterpillar.heading() == 180:
-        caterpillar.setheading(90)
+    caterpillar.setheading(90)
 
 def move_down():
-    if caterpillar.heading() == 0 or caterpillar.heading() == 180:
-        caterpillar.setheading(270)
+    caterpillar.setheading(270)
 
 def move_left():
-    if caterpillar.heading() == 90 or caterpillar.heading() == 270:
-        caterpillar.setheading(180)
+    caterpillar.setheading(180)
 
 def move_right():
-    if caterpillar.heading() == 90 or caterpillar.heading() == 270:
-        caterpillar.setheading(0)
+    caterpillar.setheading(0)
 
 turtle.onkey(start_game, "space")
 turtle.onkey(move_up, "Up")
 turtle.onkey(move_right, "Right")
 turtle.onkey(move_down, "Down")
 turtle.onkey(move_left, "Left")
+turtle.onkey(move_up, "w")
+turtle.onkey(move_right, "d")
+turtle.onkey(move_down, "s")
+turtle.onkey(move_left, "a")
 turtle.listen()
 turtle.mainloop()
