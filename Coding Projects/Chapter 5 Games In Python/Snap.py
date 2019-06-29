@@ -8,7 +8,7 @@ def next_shape():
 
     previous_color = current_color
     c.delete(shape)
-    if len(shape) > 0:
+    if len(shapes) > 0:
         shape = shapes.pop()
         c.itemconfigure(shape, state=NORMAL)
         current_color = c.itemcget(shape, 'fill')
@@ -42,7 +42,7 @@ def snap(event):
             player1_score += 1
         else:
             player2_score += 1
-        shape = c.text(200, 200, text='SNAP! You score 1 point!')
+        shape = c.create_text(200, 200, text='SNAP! You score 1 point!')
 
     else:
         if event.char == 'q':
