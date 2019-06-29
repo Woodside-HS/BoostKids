@@ -32,5 +32,6 @@ for event in events:
     days_until = days_between_dates(event[1], today)
     display = "It is %s days until %s" % (days_until, event_name)
     c.create_text(100, vertical_space, anchor="w", fill="lightblue", font="Arial 28 bold", text=display)
-
     vertical_space += 30
+
+root.mainloop() # last line is the GUI main event loop
