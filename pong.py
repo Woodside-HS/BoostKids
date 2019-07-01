@@ -45,14 +45,14 @@ def draw():
     red.draw()
     ball.draw()
 
-    display_text()
+    display_score()
 
     if blue_score >= WIN_AT:
         display_blue_win()
     elif red_score >= WIN_AT:
         display_red_win()
 
-def display_text():
+def display_score():
     screen.draw.text("SCORE:\nBlue: " + str(blue_score) + "  Red: " + str(red_score), center=(WIDTH/2, 20))
 
 # calls the update functions that move the objects
@@ -66,10 +66,12 @@ def update():
         # checks for contact with the walls and adds to score
         if ball.right >= WIDTH:
             blue_score += 1
+            display_score()
             time.sleep(2)
             reset_game()
         if ball.left <= 0:
             red_score += 1
+            display_score()
             time.sleep(2)
             reset_game()
 
@@ -190,3 +192,7 @@ def update_ball():
 #         first.xspeed = -5
 #     elif first.left <= second.right and first.left >= second.left and first.y >= second.top and first.y <= second.bottom:
 #         first.xspeed = 5
+
+
+# LINK TO FILES USED: https://www.kenney.nl/assets/puzzle-pack
+# remember to rename files to lowercase for Mu compatibility
