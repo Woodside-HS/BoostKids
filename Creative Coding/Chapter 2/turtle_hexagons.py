@@ -9,8 +9,9 @@ shelly = turtle.Turtle()
 turtle.bgcolor('black') # turn background black
 
 shelly.speed('fastest')
+x = (3,4) + (6,5)
+print( x[3])
 
-# draw 36 colored hexagons
 for i in range(36):
     for i in range(6):
         shelly.color(colors[i])
