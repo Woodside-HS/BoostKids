@@ -1,20 +1,23 @@
 #Amazing Maze
-TILE_SIZE = 140
+TILE_SIZE = 64
 WIDTH = TILE_SIZE*6
 HEIGHT = TILE_SIZE*6
 
-tiles = ['zebra', 'panda', 'parrot']
-maze = [
-        [1, 1, 1, 1, 1, 1],
-        [1, 0, 0, 0, 1, 2 ],
-        [1, 0, 0, 0, 1, 2 ],
-        [0, 0, 0, 0, 1, 2],
-        [1, 2, 2, 0, 1, 2],
-        [1, 0, 0, 0, 1, 2],
+tiles = ['empty', 'wall', 'goal', 'door', 'key']
+unlock = 0
 
+maze = [
+    [1, 1, 1, 1, 1, 1, 1, 1],
+    [1, 0, 0, 0, 1, 2, 0, 1],
+    [1, 0, 1, 0, 1, 1, 3, 1],
+    [1, 0, 1, 0, 0, 0, 0, 1],
+    [1, 0, 1, 0, 1, 0, 0, 1],
+    [1, 0, 1, 4, 1, 0, 0, 1],
+    [1, 0, 1, 0, 0, 0, 0, 1],
+    [1, 1, 1, 1, 1, 1, 1, 1]
 ]
 
-player = Actor("pig", anchor = (0,0), pos = (1*TILE_SIZE, 1*TILE_SIZE))
+player = Actor("ducky", anchor = (0,0), pos = (1*TILE_SIZE, 1*TILE_SIZE))
 enemy = Actor("sloth", anchor=(0, 0), pos=(3 * TILE_SIZE, 6 * TILE_SIZE))
 enemy.yv = -1
 
